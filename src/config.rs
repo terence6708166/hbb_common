@@ -70,9 +70,6 @@ lazy_static::lazy_static! {
 		        // IP直連
         map.insert("direct-server".to_owned(), "Y".to_owned());
         
-        // 存取模式設為完全控制
-        map.insert("access-mode".to_owned(), "full".to_owned());
-        
         // 啟用各項功能
         map.insert("enable-keyboard".to_owned(), "Y".to_owned());
         map.insert("enable-clipboard".to_owned(), "Y".to_owned());
@@ -81,8 +78,8 @@ lazy_static::lazy_static! {
         // 啟用數字一次性密碼
         map.insert("allow-numeric-one-time-password".to_owned(), "Y".to_owned());
         
-        // 設定臨時密碼長度為6位數字
-        map.insert("temporary-password-length".to_owned(), "6".to_owned());
+        // 允許遠端使用者更改設定
+        map.insert("allow-remote-config-modification".to_owned(), "Y".to_owned()); 		
 		
 		        RwLock::new(map)
     };
@@ -124,11 +121,11 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["vnc.cc"];
-pub const RS_PUB_KEY: &str = "yxY+ymafwYdfKfmlSkle8t4O76lzZYePfYjnGO1SemA=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
+pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
 
-pub const RENDEZVOUS_PORT: i32 = 22116;
-pub const RELAY_PORT: i32 = 22117;
+pub const RENDEZVOUS_PORT: i32 = 21116;
+pub const RELAY_PORT: i32 = 21117;
 pub const WS_RENDEZVOUS_PORT: i32 = 21118;
 pub const WS_RELAY_PORT: i32 = 21119;
 
@@ -979,7 +976,9 @@ impl Config {
     }
 
     pub fn no_register_device() -> bool {
-        BUILTIN_SETTINGS.read().unwrap()
+        BUILTIN_SETTINGS
+            .read()
+            .unwrap()
             .get(keys::OPTION_REGISTER_DEVICE)
             .map(|v| v == "N")
             .unwrap_or(false)
@@ -2489,6 +2488,7 @@ pub mod keys {
     pub const OPTION_ENABLE_HWCODEC: &str = "enable-hwcodec";
     pub const OPTION_APPROVE_MODE: &str = "approve-mode";
     pub const OPTION_VERIFICATION_METHOD: &str = "verification-method";
+    pub const OPTION_TEMPORARY_PASSWORD_LENGTH: &str = "temporary-password-length";
     pub const OPTION_CUSTOM_RENDEZVOUS_SERVER: &str = "custom-rendezvous-server";
     pub const OPTION_API_SERVER: &str = "api-server";
     pub const OPTION_KEY: &str = "key";
@@ -2516,7 +2516,7 @@ pub mod keys {
     pub const OPTION_HIDE_PROXY_SETTINGS: &str = "hide-proxy-settings";
     pub const OPTION_HIDE_REMOTE_PRINTER_SETTINGS: &str = "hide-remote-printer-settings";
     pub const OPTION_HIDE_WEBSOCKET_SETTINGS: &str = "hide-websocket-settings";
-    
+
     // Connection punch-through options
     pub const OPTION_ENABLE_UDP_PUNCH: &str = "enable-udp-punch";
     pub const OPTION_ENABLE_IPV6_PUNCH: &str = "enable-ipv6-punch";
@@ -2662,6 +2662,7 @@ pub mod keys {
         OPTION_ENABLE_HWCODEC,
         OPTION_APPROVE_MODE,
         OPTION_VERIFICATION_METHOD,
+        OPTION_TEMPORARY_PASSWORD_LENGTH,
         OPTION_PROXY_URL,
         OPTION_PROXY_USERNAME,
         OPTION_PROXY_PASSWORD,
@@ -2703,7 +2704,6 @@ pub mod keys {
         OPTION_HIDE_POWERED_BY_ME,
     ];
 }
-
 
 pub fn common_load<
     T: serde::Serialize + serde::de::DeserializeOwned + Default + std::fmt::Debug,
