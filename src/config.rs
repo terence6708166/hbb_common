@@ -62,7 +62,31 @@ lazy_static::lazy_static! {
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
-    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+	
+        pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        map.insert("direct-server".to_owned(), "Y".to_owned());
+		
+		        // IP直連
+        map.insert("direct-server".to_owned(), "Y".to_owned());
+        
+        // 存取模式設為完全控制
+        map.insert("access-mode".to_owned(), "full".to_owned());
+        
+        // 啟用各項功能
+        map.insert("enable-keyboard".to_owned(), "Y".to_owned());
+        map.insert("enable-clipboard".to_owned(), "Y".to_owned());
+        map.insert("enable-file-transfer".to_owned(), "Y".to_owned());
+        
+        // 啟用數字一次性密碼
+        map.insert("allow-numeric-one-time-password".to_owned(), "Y".to_owned());
+        
+        // 設定臨時密碼長度為6位數字
+        map.insert("temporary-password-length".to_owned(), "6".to_owned());
+		
+		        RwLock::new(map)
+    };
+		
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
